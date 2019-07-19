@@ -4,12 +4,23 @@
 
 #include <stdint-gcc.h>
 
-#ifndef FT8_C_VERSION_CONSTANS_PARITY_H
-#define FT8_C_VERSION_CONSTANS_PARITY_H
+#ifndef FT8_C_VERSION_CONSTANTS_H
+#define FT8_C_VERSION_CONSTANTS_H
 
-#endif //FT8_C_VERSION_CONSTANS_PARITY_H
+#endif //FT8_C_VERSION_CONSTANTS_H
+#define N 174
+#define K 91
+#define M 83 //M = N - K
+//LDPC(174, 91) code
 
-const uint8_t  Mn[][3] = {
+//Gray code
+const uint8_t gray_map[8] = {0, 1, 3, 2, 6, 7, 5, 4};
+
+//Costas 7x7 tone pattern
+const uint8_t icos7[7] = {3, 1, 4, 0, 6, 5, 2};
+
+//LDPC 174 parity arrays
+const uint8_t  Mn[N][3] = {
     { 16,  45,  73 },
     { 25,  51,  62 },
     { 33,  58,  78 },
@@ -186,7 +197,7 @@ const uint8_t  Mn[][3] = {
     { 42,  49,  57 }
 };
 
-const uint8_t Nm[][7] = {
+const uint8_t Nm[M][7] = {
     {  4,  31,  59,  91,  92,  96, 153 },
     {  5,  32,  60,  93, 115, 146,   0 },
     {  6,  24,  61,  94, 122, 151,   0 },
@@ -270,5 +281,14 @@ const uint8_t Nm[][7] = {
     { 18,  42,  79, 144, 146, 152,   0 },
     { 25,  38,  65,  99, 122, 160,   0 },
     { 17,  42,  75, 129, 170, 172,   0 }
+};
+
+const uint8_t nrw[M] = {
+    7, 6, 6, 6, 7, 6, 7, 6, 6, 7, 6, 6, 7, 7, 6, 6,
+    6, 7, 6, 7, 6, 7, 6, 6, 6, 7, 6, 6, 6, 7, 6, 6,
+    6, 6, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6,
+    6, 6, 7, 6, 6, 6, 7, 6, 6, 6, 6, 7, 6, 6, 6, 7,
+    6, 6, 6, 7, 7, 6, 6, 7, 6, 6, 6, 6, 6, 6, 6, 7,
+    6, 6, 6
 };
 
