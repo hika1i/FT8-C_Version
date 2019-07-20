@@ -13,8 +13,8 @@
 #define M 83 //M = N - K
 //LDPC(174, 91) code
 
-//Gray code
-const uint8_t gray_map[8] = {0, 1, 3, 2, 6, 7, 5, 4};
+//Gray map
+const uint8_t graymap[8] = {0, 1, 3, 2, 5, 6, 4, 7};
 
 //Costas 7x7 tone pattern
 const uint8_t icos7[7] = {3, 1, 4, 0, 6, 5, 2};
