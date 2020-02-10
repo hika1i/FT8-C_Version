@@ -28,4 +28,9 @@ void encode174(const uint8_t *message, uint8_t *codeword);
 // [IN] num_bits - number of bits in the sequence
 uint16_t crc(uint8_t *message, int num_bits);
 
+// Convert a sequence of symbols (tones) into a sinewave of continuous phase (FSK).
+// Symbol 0 gets encoded as a sine of frequency f0, the others are spaced in increasing
+// fashion.
+void synth_fsk(const uint8_t *symbols, int num_symbols, float f0, float spacing,
+               float symbol_rate, float signal_rate, float *signal);
 #endif //FT8_C_VERSION_ENCODE_H

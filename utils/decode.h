@@ -41,4 +41,6 @@ void extract_likelihood(const uint8_t *power, int num_bins, const struct Candida
 
 void extract_power(const float signal[], int num_blocks, int num_bins, uint8_t power[]);
 
+void sort_sync(int num_candidates, struct Candidate *heap);
+
 #endif //FT8_C_VERSION_DECODE_H

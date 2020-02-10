@@ -5,7 +5,7 @@
 #include "decode.h"
 #include "../constants.h"
 #include <stdlib.h>
-#include "filter.h"
+#include "signal.h"
 #include "../fft/kiss_fftr.h"
 
 // Localize top N candidates in frequency and time according to their sync strength (looking at Costas symbols)
@@ -18,19 +18,19 @@ int find_sync(const uint8_t *power, int num_blocks, int num_bins, const uint8_t 
     // Here we allow time offsets that exceed signal boundaries, as long as we still have all data bits.
     // I.e. we can afford to skip the first 7 or the last 7 Costas symbols, as long as we track how many
     // sync symbols we included in the score, so the score is averaged.
-    for (int alt = 0; alt < 4; ++alt)
+    for (uint8_t alt = 0; alt < 4; ++alt)
     {
-        for (int time_offset = -7; time_offset < num_blocks - NN + 7; ++time_offset)
+        for (int16_t time_offset = -7; time_offset < num_blocks - NN + 7; ++time_offset)
         {
-            for (int freq_offset = 0; freq_offset < num_bins - 8; ++freq_offset)
+            for (int16_t freq_offset = 0; freq_offset < num_bins - 8; ++freq_offset)
             {
-                int score = 0;
+                int16_t score = 0;
 
                 // Compute average score over sync symbols (m+k = 0-7, 36-43, 72-79)
                 int num_symbols = 0;
-                for (int m = 0; m <= 72; m += 36)
+                for (int16_t m = 0; m <= 72; m += 36)
                 {
-                    for (int k = 0; k < 7; ++k)
+                    for (int8_t k = 0; k < 7; ++k)
                     {
                         // Check for time boundaries
                         if (time_offset + k + m < 0) continue;
@@ -42,13 +42,13 @@ int find_sync(const uint8_t *power, int num_blocks, int num_bins, const uint8_t 
                         score += 8 * p8[sync_map[k]] -
                                  p8[0] - p8[1] - p8[2] - p8[3] -
                                  p8[4] - p8[5] - p8[6] - p8[7];
-
-                        // int sm = sync_map[k];
-                        // score += 4 * (int)p8[sm];
-                        // if (sm > 0) score -= p8[sm - 1];
-                        // if (sm < 7) score -= p8[sm + 1];
-                        // if (k > 0) score -= p8[sm - 4 * num_bins];
-                        // if (k < 6) score -= p8[sm + 4 * num_bins];
+//                        score += p8[sync_map[k]];
+//                         int sm = sync_map[k];
+//                         score += 4 * (int)p8[sm];
+//                         if (sm > 0) score -= p8[sm - 1];
+//                         if (sm < 7) score -= p8[sm + 1];
+//                         if (k > 0) score -= p8[sm - 4 * num_bins];
+//                         if (k < 6) score -= p8[sm + 4 * num_bins];
 
                         ++num_symbols;
                     }
@@ -273,17 +273,18 @@ void extract_power(const float signal[], int num_blocks, int num_bins, uint8_t p
 {
     const int block_size = 2 * num_bins;      // Average over 2 bins per FSK tone
     const int nfft = 2 * block_size;          // We take FFT of two blocks, advancing by one
-    const float fft_norm = 2.0f / nfft;
+    const float fft_norm = 1.0f / block_size;
 
     float window[nfft];
     for (int i = 0; i < nfft; ++i)
     {
         window[i] = blackman_i(i, nfft);
+//        window[i] = hann_i(i, nfft);
     }
 
     size_t fft_work_size;
     kiss_fftr_alloc(nfft, 0, 0, &fft_work_size);
-
+    printf("N_FFT is %d, FFT work size is %d.\n", nfft, fft_work_size);
 //    LOG(LOG_INFO, "N_FFT = %d\n", nfft);
 //    LOG(LOG_INFO, "FFT work area = %lu\n", fft_work_size);
 
@@ -324,7 +325,7 @@ void extract_power(const float signal[], int num_blocks, int num_bins, uint8_t p
                     float db1 = mag_db[j * 2 + freq_sub];
                     float db2 = mag_db[j * 2 + freq_sub + 1];
                     float db = (db1 + db2) / 2;
-
+//                    if(db < -100) continue;
                     // Scale decibels to unsigned 8-bit range and clamp the value
                     int scaled = (int) (2 * (db + 120));
                     power[offset] = (scaled < 0) ? 0 : ((scaled > 255) ? 255 : scaled);
@@ -337,4 +338,9 @@ void extract_power(const float signal[], int num_blocks, int num_bins, uint8_t p
     }
 //    LOG(LOG_INFO, "Max magnitude: %.1f dB\n", max_mag);
     free(fft_work);
+}
+
+void sort_sync(int num_candidates, struct Candidate *heap)
+{
+
 }

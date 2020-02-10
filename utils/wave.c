@@ -89,10 +89,14 @@ int load_wav(float *signal, int *num_samples, int *sample_rate, const char *path
     fread((void *) chunkID, sizeof(chunkID), 1, f);
     fread((void *) &chunkSize, sizeof(chunkSize), 1, f);
     fread((void *) format, sizeof(format), 1, f);
-
+    printf("chunkID is %s\n", chunkID);
     fread((void *) subChunk1ID, sizeof(subChunk1ID), 1, f);
     fread((void *) &subChunk1Size, sizeof(subChunk1Size), 1, f);
-    if (subChunk1Size != 16) return -1;
+    if (subChunk1Size != 16)
+    {
+        printf("sub chunk size is %d\n", subChunk1Size);
+        return -1;
+    }
 
     fread((void *) &audioFormat, sizeof(audioFormat), 1, f);
     fread((void *) &numChannels, sizeof(numChannels), 1, f);

@@ -296,7 +296,6 @@ static float fast_atanh(float x)
     return a / b;
 }
 
-
 static float pltanh(float x)
 {
     float isign = +1;

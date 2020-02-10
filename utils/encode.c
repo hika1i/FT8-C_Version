@@ -3,6 +3,7 @@
 //
 
 #include "encode.h"
+#include "math.h"
 #include "../constants.h"
 
 // Returns 1 if an odd number of bits are set in x, zero otherwise
@@ -192,5 +193,30 @@ void genft8(const uint8_t *payload, uint8_t *itone)
 
         itone[k] = graymap[bits3];
         ++k;
+    }
+}
+
+// Convert a sequence of symbols (tones) into a sinewave of continuous phase (FSK).
+// Symbol 0 gets encoded as a sine of frequency f0, the others are spaced in increasing
+// fashion.
+void synth_fsk(const uint8_t *symbols, int num_symbols, float f0, float spacing,
+               float symbol_rate, float signal_rate, float *signal) {
+    float phase = 0;
+    float dt = 1/signal_rate;
+    float dt_sym = 1/symbol_rate;
+    float t = 0;
+    int j = 0;
+    int i = 0;
+    while (j < num_symbols) {
+        float f = f0 + symbols[j] * spacing;
+        phase += 2 * M_PI * f / signal_rate;
+        signal[i] = sin(phase);
+        t += dt;
+        if (t >= dt_sym) {
+            // Move to the next symbol
+            t -= dt_sym;
+            ++j;
+        }
+        ++i;
     }
 }
